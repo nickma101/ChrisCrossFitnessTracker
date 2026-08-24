@@ -27,7 +27,7 @@ export default function Layout({ children }) {
         )}
         <Link to="/workout" className={styles.brand}>
           <span className={styles.brandMark}>✕</span>
-          CrissCross
+          CrisCross
         </Link>
         {isDevMode && (
           <span className={styles.devBadge} title="Local data — Supabase not connected">

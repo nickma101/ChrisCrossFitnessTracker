@@ -1,4 +1,4 @@
--- CrissCross Fitness Tracker — database schema
+-- CrisCross Fitness Tracker — database schema
 -- Run this in the Supabase SQL Editor (Dashboard → SQL Editor → New query).
 -- Safe to re-run: it uses "if not exists" / "drop policy if exists".
 
