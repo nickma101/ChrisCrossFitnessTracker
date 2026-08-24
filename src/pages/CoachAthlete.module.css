@@ -1,0 +1,145 @@
+.progressCard {
+  padding: 16px 18px;
+  margin-bottom: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.progressTop {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.progressCount {
+  color: var(--text-muted);
+  font-weight: 400;
+  font-size: 0.9rem;
+}
+
+.bar {
+  height: 10px;
+  border-radius: 6px;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 6px;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+.plan {
+  position: relative;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.customTag {
+  position: absolute;
+  top: -8px;
+  right: 12px;
+  z-index: 1;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.planTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.planName {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.planCount {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.planPreview {
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.actions {
+  margin: 16px 0 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fullBtn {
+  width: 100%;
+}
+
+.importRow {
+  display: flex;
+  gap: 10px;
+}
+
+.importBtn {
+  flex: 1;
+}
+
+.importError {
+  color: #f87171;
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+.statsWrap {
+  margin-bottom: 28px;
+}
+
+.workoutRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.workoutInfo {
+  min-width: 0;
+}
+
+.workoutName {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.workoutMeta {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}

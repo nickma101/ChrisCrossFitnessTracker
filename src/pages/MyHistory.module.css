@@ -1,0 +1,84 @@
+.logPast {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.loading {
+  color: var(--text-muted);
+  padding: 24px 4px;
+  text-align: center;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+.card {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.card:hover {
+  border-color: var(--accent);
+}
+
+.cardMain {
+  flex: 1;
+  min-width: 0;
+  padding: 16px;
+}
+
+.cardTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.name {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.setCount {
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.date {
+  margin-top: 2px;
+  font-size: 0.85rem;
+  color: var(--accent);
+}
+
+.exercises {
+  margin-top: 6px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.delete {
+  flex-shrink: 0;
+  padding: 0 16px;
+  background: transparent;
+  border: none;
+  border-left: 1px solid var(--border);
+  font-size: 1rem;
+  opacity: 0.7;
+}
+.delete:hover {
+  opacity: 1;
+  background: var(--surface-hover);
+}

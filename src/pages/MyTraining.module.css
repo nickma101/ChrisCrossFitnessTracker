@@ -1,0 +1,96 @@
+.goalCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px;
+  margin-bottom: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.goalTitle {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.goalSub {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.stepBtn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 1.3rem;
+  line-height: 1;
+}
+.stepBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.stepValue {
+  min-width: 24px;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.sectionHead {
+  margin-bottom: 14px;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+.loading {
+  color: var(--text-muted);
+  padding: 24px 4px;
+  text-align: center;
+}
+
+.actions {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fullBtn {
+  width: 100%;
+}
+
+.importRow {
+  display: flex;
+  gap: 10px;
+}
+
+.importBtn {
+  flex: 1;
+}
+
+.importError {
+  color: #f87171;
+  font-size: 0.88rem;
+  text-align: center;
+}

@@ -1,0 +1,95 @@
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.tab {
+  flex: 1;
+  padding: 10px 4px;
+  border-radius: 9px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.tabOn {
+  background: var(--surface);
+  color: var(--accent);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.stats {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 16px;
+}
+
+.statRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--border);
+}
+.statRow:last-of-type {
+  border-bottom: none;
+}
+
+.statLabel {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+.statValue {
+  font-size: 1.3rem;
+  font-weight: 800;
+  text-align: right;
+}
+
+.muted {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.favWrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.favChip {
+  padding: 3px 9px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.improve {
+  font-size: 1.05rem;
+}
+
+.up {
+  color: #34d399;
+}
+.down {
+  color: #f87171;
+}
+
+.improveNote {
+  padding: 0 0 14px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  text-align: right;
+}

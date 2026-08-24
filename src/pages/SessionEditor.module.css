@@ -1,0 +1,191 @@
+.loading {
+  color: var(--text-muted);
+  padding: 24px 4px;
+  text-align: center;
+}
+
+.fields {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 12px;
+}
+
+.label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.input {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  font: inherit;
+}
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.exercises {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  margin-top: 8px;
+}
+
+.exercise {
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.exHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.exSelect {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font: inherit;
+  appearance: none;
+}
+.exSelect:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.removeEx {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+.removeEx:hover {
+  color: #f87171;
+  border-color: #f87171;
+}
+
+.setHeaderRow,
+.setRow {
+  display: grid;
+  grid-template-columns: 26px 1fr 1fr 28px;
+  align-items: center;
+  gap: 8px;
+}
+
+.setHeaderRow {
+  margin-bottom: 6px;
+}
+
+.setCol,
+.inputCol {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.setCol {
+  text-align: center;
+}
+
+.setRow {
+  margin-bottom: 8px;
+}
+.setRow .setCol {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.setInput {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font: inherit;
+}
+.setInput:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.removeSet {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+.removeSet:disabled {
+  opacity: 0.3;
+}
+.removeSet:not(:disabled):hover {
+  color: #f87171;
+  border-color: #f87171;
+}
+
+.addSet {
+  margin-top: 4px;
+  width: 100%;
+  padding: 9px;
+  border-radius: 10px;
+  background: transparent;
+  border: 1px dashed var(--border);
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+.addSet:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.addExercise {
+  width: 100%;
+  margin-top: var(--gap);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 28px;
+  position: sticky;
+  bottom: 0;
+  padding: 16px 0;
+  background: linear-gradient(to top, var(--bg) 70%, transparent);
+}
+
+.actions > :last-child {
+  min-width: 140px;
+}

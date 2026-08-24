@@ -1,0 +1,199 @@
+.exercises {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+.exercise {
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.exHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.exName {
+  flex: 1;
+  min-width: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.exSelect {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font: inherit;
+  appearance: none;
+}
+.exSelect:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.target {
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.removeEx {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+.removeEx:hover {
+  color: #f87171;
+  border-color: #f87171;
+}
+
+.setHeaderRow,
+.setRow {
+  display: grid;
+  grid-template-columns: 26px 1fr 1fr auto 26px;
+  align-items: center;
+  gap: 8px;
+}
+
+.setHeaderRow {
+  margin-bottom: 6px;
+}
+
+.setCol,
+.inputCol,
+.logCol {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.setCol {
+  text-align: center;
+}
+
+.setRow {
+  margin-bottom: 8px;
+}
+
+.setRow .setCol {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.setLogged .input {
+  border-color: color-mix(in srgb, #34d399 55%, var(--border));
+  color: var(--text-muted);
+}
+
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font: inherit;
+}
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.input[readonly] {
+  opacity: 0.85;
+}
+
+.logBtn {
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.logBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.logBtnOn {
+  background: color-mix(in srgb, #34d399 18%, transparent);
+  border-color: #34d399;
+  color: #34d399;
+}
+.logBtnOn:hover {
+  border-color: #34d399;
+  color: #34d399;
+}
+
+.removeSet {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+.removeSet:disabled {
+  opacity: 0.3;
+}
+.removeSet:not(:disabled):hover {
+  color: #f87171;
+  border-color: #f87171;
+}
+
+.addSet {
+  margin-top: 4px;
+  width: 100%;
+  padding: 9px;
+  border-radius: 10px;
+  background: transparent;
+  border: 1px dashed var(--border);
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+.addSet:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.addExercise {
+  width: 100%;
+  margin-top: var(--gap);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 24px;
+  position: sticky;
+  bottom: 0;
+  padding: 16px 0;
+  background: linear-gradient(to top, var(--bg) 72%, transparent);
+}
+
+.countHint {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
