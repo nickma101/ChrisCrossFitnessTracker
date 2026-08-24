@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import Layout from './components/Layout.jsx'
 import RequireAuth from './components/RequireAuth.jsx'
 import RequireAdmin from './components/RequireAdmin.jsx'
+import { ThemeProvider } from './context/ThemeContext.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { TrainingPlansProvider } from './context/TrainingPlansContext.jsx'
 import { AppDataProvider } from './context/AppDataContext.jsx'
@@ -19,8 +20,9 @@ import CoachPlanForm from './pages/CoachPlanForm.jsx'
 
 export default function App() {
   return (
-    <AuthProvider>
-      <Routes>
+    <ThemeProvider>
+      <AuthProvider>
+        <Routes>
         <Route path="/login" element={<Login />} />
         <Route
           path="/*"
@@ -78,7 +80,8 @@ export default function App() {
             </RequireAuth>
           }
         />
-      </Routes>
-    </AuthProvider>
+        </Routes>
+      </AuthProvider>
+    </ThemeProvider>
   )
 }

@@ -69,6 +69,44 @@ export default function Workout() {
     <div>
       <PageHeader icon="🏋️" title="Workout" subtitle="Pick a plan and log your sets" />
 
+      {loading ? (
+        <p className={styles.loading}>Loading…</p>
+      ) : plans.length === 0 ? (
+        <EmptyState
+          icon="📋"
+          message="No training plans yet. Head to MyTraining to create or import one — or log a workout from a spreadsheet below."
+          action={<Button onClick={() => navigate('/mytraining')}>Go to MyTraining</Button>}
+        />
+      ) : (
+        <>
+          {scheduledToday.length > 0 && (
+            <section className={styles.section}>
+              <h2 className={styles.sectionTitle}>Scheduled today</h2>
+              <div className={styles.list}>
+                {scheduledToday.map((plan) => (
+                  <PlanRow
+                    key={plan.id}
+                    plan={plan}
+                    onStart={onStart}
+                    onEdit={onEdit}
+                    highlight
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
+          <section className={styles.section}>
+            <h2 className={styles.sectionTitle}>All plans</h2>
+            <div className={styles.list}>
+              {plans.map((plan) => (
+                <PlanRow key={plan.id} plan={plan} onStart={onStart} onEdit={onEdit} />
+              ))}
+            </div>
+          </section>
+        </>
+      )}
+
       <section className={styles.excelCard}>
         <div className={styles.excelText}>
           <h3 className={styles.excelTitle}>Log from a spreadsheet</h3>
@@ -102,44 +140,6 @@ export default function Workout() {
           hidden
         />
       </section>
-
-      {loading ? (
-        <p className={styles.loading}>Loading…</p>
-      ) : plans.length === 0 ? (
-        <EmptyState
-          icon="📋"
-          message="No training plans yet. Head to MyTraining to create or import one — or log a workout from a spreadsheet above."
-          action={<Button onClick={() => navigate('/mytraining')}>Go to MyTraining</Button>}
-        />
-      ) : (
-        <>
-          {scheduledToday.length > 0 && (
-            <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>Scheduled today</h2>
-              <div className={styles.list}>
-                {scheduledToday.map((plan) => (
-                  <PlanRow
-                    key={plan.id}
-                    plan={plan}
-                    onStart={onStart}
-                    onEdit={onEdit}
-                    highlight
-                  />
-                ))}
-              </div>
-            </section>
-          )}
-
-          <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>All plans</h2>
-            <div className={styles.list}>
-              {plans.map((plan) => (
-                <PlanRow key={plan.id} plan={plan} onStart={onStart} onEdit={onEdit} />
-              ))}
-            </div>
-          </section>
-        </>
-      )}
     </div>
   )
 }

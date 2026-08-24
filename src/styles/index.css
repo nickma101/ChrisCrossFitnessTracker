@@ -19,6 +19,22 @@
   color-scheme: dark;
 }
 
+/* Light theme — applied when documentElement has data-theme="light". */
+:root[data-theme='light'] {
+  --bg: #f6f8fb;
+  --bg-elevated: #ffffff;
+  --surface: #ffffff;
+  --surface-hover: #eef2f7;
+  --border: #dbe3ec;
+  --text: #0f172a;
+  --text-muted: #5b6b7f;
+  --accent: #0ea5e9;
+  --accent-strong: #0284c7;
+  --accent-contrast: #ffffff;
+
+  color-scheme: light;
+}
+
 * {
   box-sizing: border-box;
 }

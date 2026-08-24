@@ -60,7 +60,7 @@ export default function Login() {
     <div className={styles.wrap}>
       <div className={styles.brand}>
         <span className={styles.mark}>✕</span>
-        <span className={styles.brandName}>CrisCross</span>
+        <span className={styles.brandName}>ChrisCross</span>
       </div>
       <h1 className={styles.title}>
         {mode === 'signin' ? 'Welcome back' : 'Create your account'}

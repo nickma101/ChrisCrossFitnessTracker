@@ -69,8 +69,24 @@
   letter-spacing: 0.06em;
 }
 
-.signOut {
+.themeToggle {
   margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-size: 1rem;
+  line-height: 1;
+}
+.themeToggle:hover {
+  background: var(--surface-hover);
+}
+
+.signOut {
   padding: 8px 14px;
   border-radius: 10px;
   background: var(--surface);
