@@ -5,12 +5,19 @@ import EmptyState from '../components/EmptyState.jsx'
 import Button from '../components/Button.jsx'
 import { usePlans } from '../context/TrainingPlansContext.jsx'
 import { useAppData } from '../context/AppDataContext.jsx'
-import { EXERCISES } from '../data/exercises.js'
+import { EXERCISE_GROUPS, INTENSITIES, isCardio } from '../data/exercises.js'
 import { makeId } from '../lib/storage.js'
 import styles from './SessionEditor.module.css'
 
 function blankSet() {
   return { reps: '', weight: '' }
+}
+
+function makeEntry(name) {
+  if (isCardio(name)) {
+    return { id: makeId(), name, type: 'cardio', minutes: '', intensity: '' }
+  }
+  return { id: makeId(), name, type: 'strength', targetSets: null, targetReps: null, sets: [blankSet()] }
 }
 
 function dateToInput(ms) {
@@ -26,27 +33,44 @@ function inputToMs(str) {
 }
 
 function toEditableEntries(entries) {
-  return (entries ?? []).map((e) => ({
-    id: makeId(),
-    name: e.exerciseName ?? '',
-    targetSets: e.targetSets ?? null,
-    targetReps: e.targetReps ?? null,
-    sets:
-      e.sets && e.sets.length
-        ? e.sets.map((s) => ({
-            reps: s.reps == null ? '' : String(s.reps),
-            weight: s.weight == null ? '' : String(s.weight),
-          }))
-        : [blankSet()],
-  }))
+  return (entries ?? []).map((e) => {
+    if (e.type === 'cardio') {
+      return {
+        id: makeId(),
+        name: e.exerciseName ?? '',
+        type: 'cardio',
+        minutes: e.minutes == null ? '' : String(e.minutes),
+        intensity: e.intensity ?? '',
+      }
+    }
+    return {
+      id: makeId(),
+      name: e.exerciseName ?? '',
+      type: 'strength',
+      targetSets: e.targetSets ?? null,
+      targetReps: e.targetReps ?? null,
+      sets:
+        e.sets && e.sets.length
+          ? e.sets.map((s) => ({
+              reps: s.reps == null ? '' : String(s.reps),
+              weight: s.weight == null ? '' : String(s.weight),
+            }))
+          : [blankSet()],
+    }
+  })
 }
 
 function planToEntries(plan) {
   return plan.exercises.map((ex) => {
+    const type = ex.type || (isCardio(ex.name) ? 'cardio' : 'strength')
+    if (type === 'cardio') {
+      return { id: makeId(), name: ex.name, type: 'cardio', minutes: '', intensity: ex.intensity ?? '' }
+    }
     const count = ex.sets && ex.sets > 0 ? ex.sets : 1
     return {
       id: makeId(),
       name: ex.name,
+      type: 'strength',
       targetSets: ex.sets ?? null,
       targetReps: ex.reps ?? null,
       sets: Array.from({ length: count }, blankSet),
@@ -69,7 +93,6 @@ export default function SessionEditor() {
   const [seeded, setSeeded] = useState(!isEdit)
   const [saving, setSaving] = useState(false)
 
-  // Seed the form from the existing session once it's available (edit mode).
   useEffect(() => {
     if (isEdit && existing && !seeded) {
       setName(existing.planName || '')
@@ -79,20 +102,18 @@ export default function SessionEditor() {
     }
   }, [isEdit, existing, seeded])
 
-  const patchEntry = (eid, patch) =>
-    setEntries((prev) => prev.map((e) => (e.id === eid ? { ...e, ...patch } : e)))
-  const removeEntry = (eid) =>
-    setEntries((prev) => prev.filter((e) => e.id !== eid))
-  const addEntry = () =>
-    setEntries((prev) => [
-      ...prev,
-      { id: makeId(), name: '', targetSets: null, targetReps: null, sets: [blankSet()] },
-    ])
-  const updateSet = (eid, i, field, value) =>
+  const changeName = (eid, newName) =>
+    setEntries((prev) => prev.map((e) => (e.id === eid ? { ...makeEntry(newName), id: eid } : e)))
+  const removeEntry = (eid) => setEntries((prev) => prev.filter((e) => e.id !== eid))
+  const addEntry = () => setEntries((prev) => [...prev, makeEntry('')])
+
+  const updateCardio = (eid, field, val) =>
+    setEntries((prev) => prev.map((e) => (e.id === eid ? { ...e, [field]: val } : e)))
+  const updateSet = (eid, i, field, val) =>
     setEntries((prev) =>
       prev.map((e) =>
         e.id === eid
-          ? { ...e, sets: e.sets.map((s, j) => (j === i ? { ...s, [field]: value } : s)) }
+          ? { ...e, sets: e.sets.map((s, j) => (j === i ? { ...s, [field]: val } : s)) }
           : e,
       ),
     )
@@ -102,9 +123,7 @@ export default function SessionEditor() {
     )
   const removeSet = (eid, i) =>
     setEntries((prev) =>
-      prev.map((e) =>
-        e.id === eid ? { ...e, sets: e.sets.filter((_, j) => j !== i) } : e,
-      ),
+      prev.map((e) => (e.id === eid ? { ...e, sets: e.sets.filter((_, j) => j !== i) } : e)),
     )
 
   const prefillFromPlan = (planId) => {
@@ -122,17 +141,26 @@ export default function SessionEditor() {
   const handleSave = async () => {
     const cleaned = entries
       .filter((e) => e.name.trim())
-      .map((e) => ({
-        exerciseName: e.name,
-        targetSets: e.targetSets,
-        targetReps: e.targetReps,
-        sets: e.sets
-          .filter((s) => s.reps !== '' || s.weight !== '')
-          .map((s) => ({
-            reps: s.reps === '' ? null : Number(s.reps),
-            weight: s.weight === '' ? null : Number(s.weight),
-          })),
-      }))
+      .map((e) =>
+        e.type === 'cardio'
+          ? {
+              exerciseName: e.name,
+              type: 'cardio',
+              minutes: e.minutes === '' ? null : Number(e.minutes),
+              intensity: e.intensity || null,
+            }
+          : {
+              exerciseName: e.name,
+              targetSets: e.targetSets,
+              targetReps: e.targetReps,
+              sets: e.sets
+                .filter((s) => s.reps !== '' || s.weight !== '')
+                .map((s) => ({
+                  reps: s.reps === '' ? null : Number(s.reps),
+                  weight: s.weight === '' ? null : Number(s.weight),
+                })),
+            },
+      )
 
     const performedAt = inputToMs(dateStr)
     const workoutName = name.trim() || 'Workout'
@@ -222,14 +250,18 @@ export default function SessionEditor() {
               <select
                 className={styles.exSelect}
                 value={entry.name}
-                onChange={(e) => patchEntry(entry.id, { name: e.target.value })}
+                onChange={(e) => changeName(entry.id, e.target.value)}
                 aria-label="Exercise"
               >
                 <option value="">Choose an exercise…</option>
-                {EXERCISES.map((n) => (
-                  <option key={n} value={n}>
-                    {n}
-                  </option>
+                {EXERCISE_GROUPS.map((g) => (
+                  <optgroup key={g.label} label={g.label}>
+                    {g.options.map((n) => (
+                      <option key={n} value={n}>
+                        {n}
+                      </option>
+                    ))}
+                  </optgroup>
                 ))}
               </select>
               <button
@@ -242,51 +274,78 @@ export default function SessionEditor() {
               </button>
             </div>
 
-            <div className={styles.setHeaderRow}>
-              <span className={styles.setCol}>Set</span>
-              <span className={styles.inputCol}>Reps</span>
-              <span className={styles.inputCol}>Weight</span>
-              <span className={styles.removeCol} />
-            </div>
-
-            {entry.sets.map((set, i) => (
-              <div key={i} className={styles.setRow}>
-                <span className={styles.setCol}>{i + 1}</span>
-                <input
-                  className={styles.setInput}
-                  type="number"
-                  inputMode="numeric"
-                  placeholder={entry.targetReps ? String(entry.targetReps) : 'reps'}
-                  value={set.reps}
-                  onChange={(e) => updateSet(entry.id, i, 'reps', e.target.value)}
-                />
-                <input
-                  className={styles.setInput}
-                  type="number"
-                  inputMode="decimal"
-                  placeholder="kg"
-                  value={set.weight}
-                  onChange={(e) => updateSet(entry.id, i, 'weight', e.target.value)}
-                />
-                <button
-                  type="button"
-                  className={styles.removeSet}
-                  onClick={() => removeSet(entry.id, i)}
-                  aria-label="Remove set"
-                  disabled={entry.sets.length === 1}
-                >
-                  ✕
-                </button>
+            {entry.type === 'cardio' ? (
+              <div className={styles.cardioFields}>
+                <label className={styles.cardioField}>
+                  <span className={styles.smallLabel}>Minutes</span>
+                  <input
+                    className={styles.setInput}
+                    type="number"
+                    inputMode="numeric"
+                    placeholder="20"
+                    value={entry.minutes}
+                    onChange={(e) => updateCardio(entry.id, 'minutes', e.target.value)}
+                  />
+                </label>
+                <label className={styles.cardioField}>
+                  <span className={styles.smallLabel}>Intensity</span>
+                  <select
+                    className={styles.setInput}
+                    value={entry.intensity}
+                    onChange={(e) => updateCardio(entry.id, 'intensity', e.target.value)}
+                  >
+                    <option value="">—</option>
+                    {INTENSITIES.map((lvl) => (
+                      <option key={lvl} value={lvl}>
+                        {lvl}
+                      </option>
+                    ))}
+                  </select>
+                </label>
               </div>
-            ))}
-
-            <button
-              type="button"
-              className={styles.addSet}
-              onClick={() => addSet(entry.id)}
-            >
-              ＋ Add set
-            </button>
+            ) : (
+              <>
+                <div className={styles.setHeaderRow}>
+                  <span className={styles.setCol}>Set</span>
+                  <span className={styles.inputCol}>Reps</span>
+                  <span className={styles.inputCol}>Weight</span>
+                  <span className={styles.removeCol} />
+                </div>
+                {entry.sets.map((set, i) => (
+                  <div key={i} className={styles.setRow}>
+                    <span className={styles.setCol}>{i + 1}</span>
+                    <input
+                      className={styles.setInput}
+                      type="number"
+                      inputMode="numeric"
+                      placeholder={entry.targetReps ? String(entry.targetReps) : 'reps'}
+                      value={set.reps}
+                      onChange={(e) => updateSet(entry.id, i, 'reps', e.target.value)}
+                    />
+                    <input
+                      className={styles.setInput}
+                      type="number"
+                      inputMode="decimal"
+                      placeholder="kg"
+                      value={set.weight}
+                      onChange={(e) => updateSet(entry.id, i, 'weight', e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      className={styles.removeSet}
+                      onClick={() => removeSet(entry.id, i)}
+                      aria-label="Remove set"
+                      disabled={entry.sets.length === 1}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+                <button type="button" className={styles.addSet} onClick={() => addSet(entry.id)}>
+                  ＋ Add set
+                </button>
+              </>
+            )}
           </div>
         ))}
       </div>

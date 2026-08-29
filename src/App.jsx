@@ -6,6 +6,7 @@ import { ThemeProvider } from './context/ThemeContext.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { TrainingPlansProvider } from './context/TrainingPlansContext.jsx'
 import { AppDataProvider } from './context/AppDataContext.jsx'
+import { ActiveWorkoutProvider } from './context/ActiveWorkoutContext.jsx'
 import Login from './pages/Login.jsx'
 import Workout from './pages/Workout.jsx'
 import WorkoutSession from './pages/WorkoutSession.jsx'
@@ -30,12 +31,13 @@ export default function App() {
             <RequireAuth>
               <TrainingPlansProvider>
                 <AppDataProvider>
+                  <ActiveWorkoutProvider>
                   <Layout>
                     <Routes>
                       <Route path="/" element={<Navigate to="/workout" replace />} />
 
                       <Route path="/workout" element={<Workout />} />
-                      <Route path="/workout/:planId" element={<WorkoutSession />} />
+                      <Route path="/workout/session" element={<WorkoutSession />} />
 
                       <Route path="/mytraining" element={<MyTraining />} />
                       <Route path="/mytraining/new" element={<PlanForm />} />
@@ -75,6 +77,7 @@ export default function App() {
                       <Route path="*" element={<Navigate to="/workout" replace />} />
                     </Routes>
                   </Layout>
+                  </ActiveWorkoutProvider>
                 </AppDataProvider>
               </TrainingPlansProvider>
             </RequireAuth>

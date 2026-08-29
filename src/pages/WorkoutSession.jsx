@@ -1,268 +1,275 @@
 import { useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import PageHeader from '../components/PageHeader.jsx'
 import EmptyState from '../components/EmptyState.jsx'
 import Button from '../components/Button.jsx'
-import { usePlans } from '../context/TrainingPlansContext.jsx'
+import { useActiveWorkout } from '../context/ActiveWorkoutContext.jsx'
 import { useAppData } from '../context/AppDataContext.jsx'
-import { EXERCISES } from '../data/exercises.js'
-import { makeId } from '../lib/storage.js'
+import { EXERCISE_GROUPS, INTENSITIES } from '../data/exercises.js'
+import { blankStrengthEntry, blankEntry, loggedCount, commitEntries } from '../lib/workoutDraft.js'
 import styles from './WorkoutSession.module.css'
 
-// One editable set row.
-function blankSet() {
-  return { reps: '', weight: '', logged: false }
-}
-
-// Builds the initial log from a plan: one row per target set.
-function initLog(plan) {
-  return plan.exercises.map((ex) => {
-    const setCount = ex.sets && ex.sets > 0 ? ex.sets : 1
-    return {
-      exerciseId: ex.id,
-      name: ex.name,
-      targetSets: ex.sets ?? null,
-      targetReps: ex.reps ?? null,
-      sets: Array.from({ length: setCount }, blankSet),
-    }
-  })
+function ExerciseSelect({ value, onChange }) {
+  return (
+    <select
+      className={styles.exSelect}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      aria-label="Exercise"
+    >
+      <option value="">Choose an exercise…</option>
+      {EXERCISE_GROUPS.map((g) => (
+        <optgroup key={g.label} label={g.label}>
+          {g.options.map((n) => (
+            <option key={n} value={n}>
+              {n}
+            </option>
+          ))}
+        </optgroup>
+      ))}
+    </select>
+  )
 }
 
 export default function WorkoutSession() {
-  const { planId } = useParams()
   const navigate = useNavigate()
-  const { getPlan } = usePlans()
+  const { active, patchWorkout, discardWorkout } = useActiveWorkout()
   const { logSession } = useAppData()
-
-  const plan = getPlan(planId)
-  const [log, setLog] = useState(() => (plan ? initLog(plan) : []))
   const [saving, setSaving] = useState(false)
 
-  const loggedSetCount = useMemo(
-    () =>
-      log.reduce((n, ex) => n + ex.sets.filter((s) => s.logged).length, 0),
-    [log],
-  )
+  const logged = useMemo(() => (active ? loggedCount(active.log) : 0), [active])
 
-  if (!plan) {
+  if (!active) {
     return (
       <div>
         <PageHeader icon="🏋️" title="Workout" />
         <EmptyState
-          icon="🤔"
-          message="That plan couldn't be found."
-          action={<Button onClick={() => navigate('/workout')}>Back to Workout</Button>}
+          icon="🏋️"
+          message="No workout in progress. Start one from the Workout tab."
+          action={<Button onClick={() => navigate('/workout')}>Go to Workout</Button>}
         />
       </div>
     )
   }
 
-  const patchExercise = (exId, patch) =>
-    setLog((prev) =>
-      prev.map((ex) => (ex.exerciseId === exId ? { ...ex, ...patch } : ex)),
-    )
+  const setLog = (fn) => patchWorkout((a) => ({ ...a, log: fn(a.log) }))
+  const setName = (name) => patchWorkout((a) => ({ ...a, name }))
 
-  const updateSet = (exId, setIdx, field, value) =>
-    setLog((prev) =>
-      prev.map((ex) =>
-        ex.exerciseId === exId
-          ? {
-              ...ex,
-              sets: ex.sets.map((s, i) =>
-                i === setIdx ? { ...s, [field]: value } : s,
-              ),
-            }
-          : ex,
+  const changeName = (id, name) =>
+    setLog((log) => log.map((e) => (e.id === id ? { ...blankEntry(name), id } : e)))
+  const removeEntry = (id) => setLog((log) => log.filter((e) => e.id !== id))
+  const addExercise = () => setLog((log) => [...log, blankStrengthEntry('')])
+
+  // strength helpers
+  const updateSet = (id, i, field, val) =>
+    setLog((log) =>
+      log.map((e) =>
+        e.id === id
+          ? { ...e, sets: e.sets.map((s, j) => (j === i ? { ...s, [field]: val } : s)) }
+          : e,
       ),
     )
-
-  const toggleLogged = (exId, setIdx) =>
-    setLog((prev) =>
-      prev.map((ex) =>
-        ex.exerciseId === exId
-          ? {
-              ...ex,
-              sets: ex.sets.map((s, i) =>
-                i === setIdx ? { ...s, logged: !s.logged } : s,
-              ),
-            }
-          : ex,
+  const toggleSet = (id, i) =>
+    setLog((log) =>
+      log.map((e) =>
+        e.id === id
+          ? { ...e, sets: e.sets.map((s, j) => (j === i ? { ...s, logged: !s.logged } : s)) }
+          : e,
       ),
     )
-
-  const addSet = (exId) =>
-    setLog((prev) =>
-      prev.map((ex) =>
-        ex.exerciseId === exId ? { ...ex, sets: [...ex.sets, blankSet()] } : ex,
+  const addSet = (id) =>
+    setLog((log) =>
+      log.map((e) =>
+        e.id === id ? { ...e, sets: [...e.sets, { reps: '', weight: '', logged: false }] } : e,
       ),
     )
-
-  const removeSet = (exId, setIdx) =>
-    setLog((prev) =>
-      prev.map((ex) =>
-        ex.exerciseId === exId
-          ? { ...ex, sets: ex.sets.filter((_, i) => i !== setIdx) }
-          : ex,
-      ),
+  const removeSet = (id, i) =>
+    setLog((log) =>
+      log.map((e) => (e.id === id ? { ...e, sets: e.sets.filter((_, j) => j !== i) } : e)),
     )
 
-  // Remove an exercise from THIS workout only (never touches the plan).
-  const removeExercise = (exId) =>
-    setLog((prev) => prev.filter((ex) => ex.exerciseId !== exId))
-
-  // Add an exercise to THIS workout only.
-  const addExercise = () =>
-    setLog((prev) => [
-      ...prev,
-      {
-        exerciseId: makeId(),
-        name: '',
-        targetSets: null,
-        targetReps: null,
-        sets: [blankSet()],
-        added: true,
-      },
-    ])
+  // cardio helpers
+  const updateCardio = (id, field, val) =>
+    setLog((log) => log.map((e) => (e.id === id ? { ...e, [field]: val } : e)))
+  const toggleCardio = (id) =>
+    setLog((log) => log.map((e) => (e.id === id ? { ...e, logged: !e.logged } : e)))
 
   const finish = async () => {
     setSaving(true)
-    const entries = log
-      .filter((ex) => ex.name && ex.sets.some((s) => s.logged))
-      .map((ex) => ({
-        exerciseName: ex.name,
-        targetSets: ex.targetSets,
-        targetReps: ex.targetReps,
-        sets: ex.sets
-          .filter((s) => s.logged)
-          .map((s) => ({
-            reps: s.reps === '' ? null : Number(s.reps),
-            weight: s.weight === '' ? null : Number(s.weight),
-          })),
-      }))
+    const entries = commitEntries(active.log)
     try {
-      await logSession({ planId: plan.id, planName: plan.name, entries })
-      navigate('/progress')
+      await logSession({
+        planId: active.planId,
+        planName: (active.name || '').trim() || 'Workout',
+        entries,
+        performedAt: Date.now(),
+      })
+      discardWorkout()
+      navigate('/history')
     } catch {
       setSaving(false)
     }
   }
 
+  const discard = () => {
+    if (window.confirm('Discard this workout? Logged sets will be lost.')) {
+      discardWorkout()
+      navigate('/workout')
+    }
+  }
+
   return (
     <div>
-      <PageHeader
-        icon="🏋️"
-        title={plan.name}
-        subtitle="Log each set as you complete it"
-      />
+      <PageHeader icon="🏋️" title="Workout" subtitle="Log each set as you complete it" />
+
+      <label className={styles.nameField}>
+        <span className={styles.nameLabel}>Workout name</span>
+        <input
+          className={styles.nameInput}
+          type="text"
+          value={active.name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="e.g. Push Day"
+        />
+      </label>
 
       <div className={styles.exercises}>
-        {log.map((ex) => (
-          <div key={ex.exerciseId} className={styles.exercise}>
+        {active.log.map((entry) => (
+          <div key={entry.id} className={styles.exercise}>
             <div className={styles.exHead}>
-              {ex.name && !ex.added ? (
-                <h3 className={styles.exName}>{ex.name}</h3>
-              ) : (
-                <select
-                  className={styles.exSelect}
-                  value={ex.name}
-                  onChange={(e) => patchExercise(ex.exerciseId, { name: e.target.value })}
-                  aria-label="Exercise"
-                >
-                  <option value="">Choose an exercise…</option>
-                  {EXERCISES.map((name) => (
-                    <option key={name} value={name}>
-                      {name}
-                    </option>
-                  ))}
-                </select>
-              )}
-              {(ex.targetSets || ex.targetReps) && (
-                <span className={styles.target}>
-                  {ex.targetSets ?? '–'} × {ex.targetReps ?? '–'}
-                </span>
-              )}
+              <ExerciseSelect value={entry.name} onChange={(n) => changeName(entry.id, n)} />
+              {entry.type === 'cardio'
+                ? entry.targetMinutes && (
+                    <span className={styles.target}>{entry.targetMinutes} min</span>
+                  )
+                : (entry.targetSets || entry.targetReps) && (
+                    <span className={styles.target}>
+                      {entry.targetSets ?? '–'} × {entry.targetReps ?? '–'}
+                    </span>
+                  )}
               <button
                 type="button"
                 className={styles.removeEx}
-                onClick={() => removeExercise(ex.exerciseId)}
-                aria-label={`Remove ${ex.name || 'exercise'} from this workout`}
+                onClick={() => removeEntry(entry.id)}
+                aria-label="Remove exercise from this workout"
                 title="Remove from this workout only"
               >
                 ✕
               </button>
             </div>
 
-            <div className={styles.setHeaderRow}>
-              <span className={styles.setCol}>Set</span>
-              <span className={styles.inputCol}>Reps</span>
-              <span className={styles.inputCol}>Weight</span>
-              <span className={styles.logCol} />
-            </div>
-
-            {ex.sets.map((set, i) => (
-              <div
-                key={i}
-                className={`${styles.setRow} ${set.logged ? styles.setLogged : ''}`.trim()}
-              >
-                <span className={styles.setCol}>{i + 1}</span>
-                <input
-                  className={styles.input}
-                  type="number"
-                  inputMode="numeric"
-                  placeholder={ex.targetReps ? String(ex.targetReps) : 'reps'}
-                  value={set.reps}
-                  readOnly={set.logged}
-                  onChange={(e) => updateSet(ex.exerciseId, i, 'reps', e.target.value)}
-                />
-                <input
-                  className={styles.input}
-                  type="number"
-                  inputMode="decimal"
-                  placeholder="kg"
-                  value={set.weight}
-                  readOnly={set.logged}
-                  onChange={(e) => updateSet(ex.exerciseId, i, 'weight', e.target.value)}
-                />
+            {entry.type === 'cardio' ? (
+              <div className={styles.cardio}>
+                <div className={styles.cardioFields}>
+                  <label className={styles.cardioField}>
+                    <span className={styles.smallLabel}>Minutes</span>
+                    <input
+                      className={styles.input}
+                      type="number"
+                      inputMode="numeric"
+                      placeholder="20"
+                      value={entry.minutes}
+                      readOnly={entry.logged}
+                      onChange={(e) => updateCardio(entry.id, 'minutes', e.target.value)}
+                    />
+                  </label>
+                  <div className={styles.cardioField}>
+                    <span className={styles.smallLabel}>Intensity</span>
+                    <div className={styles.intensity}>
+                      {INTENSITIES.map((lvl) => (
+                        <button
+                          key={lvl}
+                          type="button"
+                          disabled={entry.logged}
+                          className={`${styles.intBtn} ${entry.intensity === lvl ? styles.intOn : ''}`.trim()}
+                          onClick={() => updateCardio(entry.id, 'intensity', lvl)}
+                        >
+                          {lvl}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
                 <button
                   type="button"
-                  className={`${styles.logBtn} ${set.logged ? styles.logBtnOn : ''}`.trim()}
-                  onClick={() => toggleLogged(ex.exerciseId, i)}
+                  className={`${styles.logWide} ${entry.logged ? styles.logOn : ''}`.trim()}
+                  onClick={() => toggleCardio(entry.id)}
                 >
-                  {set.logged ? '✓ Logged' : 'Log'}
-                </button>
-                <button
-                  type="button"
-                  className={styles.removeSet}
-                  onClick={() => removeSet(ex.exerciseId, i)}
-                  aria-label="Remove set"
-                  disabled={ex.sets.length === 1}
-                >
-                  ✕
+                  {entry.logged ? '✓ Logged' : 'Log warm-up'}
                 </button>
               </div>
-            ))}
-
-            <button
-              type="button"
-              className={styles.addSet}
-              onClick={() => addSet(ex.exerciseId)}
-            >
-              ＋ Add set
-            </button>
+            ) : (
+              <>
+                <div className={styles.setHeaderRow}>
+                  <span className={styles.setCol}>Set</span>
+                  <span className={styles.inputCol}>Reps</span>
+                  <span className={styles.inputCol}>Weight</span>
+                  <span className={styles.logCol} />
+                </div>
+                {entry.sets.map((set, i) => (
+                  <div
+                    key={i}
+                    className={`${styles.setRow} ${set.logged ? styles.setLogged : ''}`.trim()}
+                  >
+                    <span className={styles.setCol}>{i + 1}</span>
+                    <input
+                      className={styles.input}
+                      type="number"
+                      inputMode="numeric"
+                      placeholder={entry.targetReps ? String(entry.targetReps) : 'reps'}
+                      value={set.reps}
+                      readOnly={set.logged}
+                      onChange={(e) => updateSet(entry.id, i, 'reps', e.target.value)}
+                    />
+                    <input
+                      className={styles.input}
+                      type="number"
+                      inputMode="decimal"
+                      placeholder="kg"
+                      value={set.weight}
+                      readOnly={set.logged}
+                      onChange={(e) => updateSet(entry.id, i, 'weight', e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      className={`${styles.logBtn} ${set.logged ? styles.logOn : ''}`.trim()}
+                      onClick={() => toggleSet(entry.id, i)}
+                    >
+                      {set.logged ? '✓' : 'Log'}
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.removeSet}
+                      onClick={() => removeSet(entry.id, i)}
+                      aria-label="Remove set"
+                      disabled={entry.sets.length === 1}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+                <button type="button" className={styles.addSet} onClick={() => addSet(entry.id)}>
+                  ＋ Add set
+                </button>
+              </>
+            )}
           </div>
         ))}
       </div>
 
       <Button variant="secondary" className={styles.addExercise} onClick={addExercise}>
-        ＋ Add exercise (this workout only)
+        ＋ Add exercise
       </Button>
 
       <div className={styles.footer}>
+        <button type="button" className={styles.discard} onClick={discard}>
+          Discard
+        </button>
         <span className={styles.countHint}>
-          {loggedSetCount} {loggedSetCount === 1 ? 'set' : 'sets'} logged
+          {logged} {logged === 1 ? 'item' : 'items'} logged
         </span>
-        <Button onClick={finish} disabled={saving || loggedSetCount === 0}>
-          {saving ? 'Saving…' : 'Finish workout'}
+        <Button onClick={finish} disabled={saving || logged === 0}>
+          {saving ? 'Saving…' : 'Finish'}
         </Button>
       </div>
     </div>

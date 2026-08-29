@@ -91,6 +91,25 @@
   border-color: #f87171;
 }
 
+.cardioFields {
+  display: flex;
+  gap: 12px;
+}
+
+.cardioField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.smallLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
 .setHeaderRow,
 .setRow {
   display: grid;

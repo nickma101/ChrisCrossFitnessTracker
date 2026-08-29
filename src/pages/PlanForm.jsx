@@ -6,6 +6,7 @@ import ExerciseRow from '../components/ExerciseRow.jsx'
 import ScheduleField from '../components/ScheduleField.jsx'
 import { usePlans } from '../context/TrainingPlansContext.jsx'
 import { normalizeSchedule } from '../data/schedule.js'
+import { isCardio } from '../data/exercises.js'
 import { makeId } from '../lib/storage.js'
 import styles from './PlanForm.module.css'
 
@@ -21,6 +22,8 @@ function toEditable(exercises) {
     name: e.name ?? '',
     sets: e.sets == null ? '' : String(e.sets),
     reps: e.reps == null ? '' : String(e.reps),
+    minutes: e.minutes == null ? '' : String(e.minutes),
+    intensity: e.intensity ?? '',
     notes: e.notes ?? '',
   }))
 }
@@ -64,13 +67,24 @@ export default function PlanForm() {
   const handleSave = async () => {
     const cleaned = exercises
       .filter((e) => e.name.trim())
-      .map((e) => ({
-        id: e.id,
-        name: e.name,
-        sets: e.sets === '' ? null : Number(e.sets),
-        reps: e.reps === '' ? null : Number(e.reps),
-        notes: e.notes.trim(),
-      }))
+      .map((e) =>
+        isCardio(e.name)
+          ? {
+              id: e.id,
+              name: e.name,
+              type: 'cardio',
+              minutes: e.minutes === '' ? null : Number(e.minutes),
+              intensity: e.intensity || null,
+              notes: e.notes.trim(),
+            }
+          : {
+              id: e.id,
+              name: e.name,
+              sets: e.sets === '' ? null : Number(e.sets),
+              reps: e.reps === '' ? null : Number(e.reps),
+              notes: e.notes.trim(),
+            },
+      )
 
     const payload = { name: name.trim(), exercises: cleaned, schedule }
     setSaving(true)

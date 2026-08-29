@@ -1,3 +1,32 @@
+.nameField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
+.nameLabel,
+.smallLabel {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.nameInput {
+  width: 100%;
+  padding: 13px 15px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  font: inherit;
+  font-size: 1.05rem;
+}
+.nameInput:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
 .exercises {
   display: flex;
   flex-direction: column;
@@ -16,13 +45,6 @@
   align-items: center;
   gap: 10px;
   margin-bottom: 12px;
-}
-
-.exName {
-  flex: 1;
-  min-width: 0;
-  font-size: 1.05rem;
-  font-weight: 600;
 }
 
 .exSelect {
@@ -62,6 +84,64 @@
   border-color: #f87171;
 }
 
+/* cardio */
+.cardio {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cardioFields {
+  display: flex;
+  gap: 12px;
+}
+
+.cardioField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.intensity {
+  display: flex;
+  gap: 6px;
+}
+
+.intBtn {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.intBtn:disabled {
+  opacity: 0.6;
+}
+.intOn {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.logWide {
+  padding: 11px;
+  border-radius: 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.logWide:hover {
+  border-color: var(--accent);
+}
+
+/* strength */
 .setHeaderRow,
 .setRow {
   display: grid;
@@ -69,11 +149,9 @@
   align-items: center;
   gap: 8px;
 }
-
 .setHeaderRow {
   margin-bottom: 6px;
 }
-
 .setCol,
 .inputCol,
 .logCol {
@@ -81,21 +159,17 @@
   color: var(--text-muted);
   font-weight: 500;
 }
-
 .setCol {
   text-align: center;
 }
-
 .setRow {
   margin-bottom: 8px;
 }
-
 .setRow .setCol {
   font-size: 0.9rem;
   font-weight: 700;
   color: var(--text-muted);
 }
-
 .setLogged .input {
   border-color: color-mix(in srgb, #34d399 55%, var(--border));
   color: var(--text-muted);
@@ -133,12 +207,12 @@
   color: var(--accent);
 }
 
-.logBtnOn {
+.logOn {
   background: color-mix(in srgb, #34d399 18%, transparent);
   border-color: #34d399;
   color: #34d399;
 }
-.logBtnOn:hover {
+.logOn:hover {
   border-color: #34d399;
   color: #34d399;
 }
@@ -193,7 +267,20 @@
   background: linear-gradient(to top, var(--bg) 72%, transparent);
 }
 
+.discard {
+  background: transparent;
+  border: none;
+  color: #f87171;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 8px 4px;
+}
+.discard:hover {
+  color: #fca5a5;
+}
+
 .countHint {
   color: var(--text-muted);
-  font-size: 0.88rem;
+  font-size: 0.85rem;
+  margin-left: auto;
 }
